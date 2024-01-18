@@ -1,8 +1,9 @@
-#include"strcomp.h"
 #include"mbytesreader.h"
-#include"listdir.h"
+#include"compare.h"
 #include<stdio.h>
 #include<unistd.h>
+#include<stdlib.h>
+#include<string>
 
 #define TS(x) std::string(x)
 
@@ -16,8 +17,11 @@ int main(int argc, char** argv)
   //2) extract each docx to its own specific dir
 	extract_docx(TS(argv[1]));
 	extract_docx(TS(argv[2]));
+  //3) compute comparision
 
-  //3) clean up all dirs
+	auto diff = compare(TS(argv[1]),TS(argv[2]));
+	
+  //4) clean up all dirs
 	cleanup(TS(argv[1]),TS(argv[2]));
 	
 	return 0;
@@ -49,9 +53,14 @@ void extract_docx(const std::string& file)
   command      += "cd "+file+".ext && ";
   command      += "unzip ../"+file;
   system(command.c_str());
+  system("clear");
 }
 void cleanup(const std::string& file1, const std::string& file2)
 {
-  auto command = "rm -rf "+file1+" && rm -rf "+file2;
+  
+  auto command = "rm "+file1+" && rm "+file2;
+  system(command.c_str());
+  
+  command = "rm -rf "+file1+".ext"+ "&& rm -rf "+file2+".ext";
   system(command.c_str());
 }

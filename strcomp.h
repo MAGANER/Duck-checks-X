@@ -47,6 +47,6 @@ extern double compute_string_difference_percentage
 		return diff_count;
 	}
 }
-
+#define CSDP(a,b) compute_string_difference_percentage(a,b)
 
 #endif
