@@ -12,9 +12,9 @@ int main(int argc, char** argv)
 }
 int prepare(int argc, char** argv)
 {
-	if (argc != 3)
+	if (argc != 4)
 	{
-		printf("DCX error: incorrect number of arguments! \n Usage example: dcx file1.docx file2.docx\n");
+		printf("DCX error: incorrect number of arguments! \n Usage example: dcx file1.docx file2.docx convertioapi_key\n");
 		return -1;
 	}
 
