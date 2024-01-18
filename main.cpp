@@ -6,16 +6,12 @@
 #define TS(x) std::string(x)
 
 inline int prepare(int argc, char** argv);
-inline void convert_docx(const std::string& file, const std::string& key);
 int main(int argc, char** argv)
 {
   //1) check input data correctness
 	if (prepare(argc, argv) == -1) return -1;
-  //2) convert docx(crappy format) to html. (It would take some time, but it's worth it)
-	convert_docx(TS(argv[1]),TS(argv[3]));
-	convert_docx(TS(argv[2]),TS(argv[3]));
-	
-
+ 
+       
 	return 0;
 }
 int prepare(int argc, char** argv)
@@ -38,9 +34,4 @@ int prepare(int argc, char** argv)
 	}
 
 	return 0;
-}
-void convert_docx(const std::string& file, const std::string& key)
-{
-  std::string command = "python convert.py "+file +" "+key;
-  system(command.c_str());
 }
