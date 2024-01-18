@@ -1,52 +1,33 @@
 #ifndef STRCOMP_H
 #define STRCOMP_H
 #include<string>
-#define CDP(size, count) 100.0 - (double)count/(double)size
-#define MAX(a,b) a > b? a: b
-#define ABS(x) x< 0? x*(-1): x 
 
-static size_t count_equal_chars
-(
-	const std::string& a,
-	const std::string& b,
-	size_t size
-)
+//thanks to this JS solution
+//https://stackoverflow.com/questions/41561452/is-there-any-way-to-calculate-match-between-2-strings
+extern double match(const std::string& str1, const std::string& str2)
 {
-	size_t count = 0;
-	for (size_t i = 0; i < size; ++i)
-		if (a[i] == b[i]) count++;
+  double tmpValue = 0;
+  int minLength = str1.length();
+  if(str1.length() > str2.length())
+  {
+    minLength = str2.length();
+  }
+  
+  int maxLength = str1.length();
+  if(str1.length() < str2.length())
+    {
+      maxLength = str2.length();
+    }
+  for(int i = 0; i < minLength; i++)
+    {
+      if(str1[i] == str2[i])
+      {
+	tmpValue++;
+      }
+    }
 
-	return count;
+  double weight = tmpValue / maxLength;
+  return (weight * 100);
 }
-extern double compute_string_difference_percentage
-(
-	const std::string& a,
-	const std::string& b
-)
-{
-	size_t len1 = a.length();
-	size_t len2 = b.length();
-
-	size_t equal_chars_count = 0;
-	if (a.size() == b.size())
-		equal_chars_count = count_equal_chars(a, b, a.size());
-	else if (a.size() > b.size())
-		equal_chars_count = count_equal_chars(a, b, b.size());
-	else
-		equal_chars_count = count_equal_chars(a, b, a.size());
-
-	
-	if (a.size() == b.size())
-	{
-		return CDP((int)a.size(),(int)equal_chars_count);
-	}
-	else
-	{
-		size_t max_len = MAX(a.size(), b.size());
-		auto diff_count = CDP(max_len, equal_chars_count);
-		return diff_count;
-	}
-}
-#define CSDP(a,b) compute_string_difference_percentage(a,b)
 
 #endif
