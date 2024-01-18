@@ -1,5 +1,6 @@
 #include"mbytesreader.h"
 #include"compare.h"
+#include"colors.h"
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
@@ -20,10 +21,11 @@ int main(int argc, char** argv)
   //3) compute comparision
 
 	auto diff = compare(TS(argv[1]),TS(argv[2]));
+	printf("high level difference: %s %f%%\n",ANSI_COLOR_RED,diff->high_level);
 	
   //4) clean up all dirs
 	cleanup(TS(argv[1]),TS(argv[2]));
-	
+	delete diff;
 	return 0;
 }
 int prepare(int argc, char** argv)
