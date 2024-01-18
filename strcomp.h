@@ -4,21 +4,23 @@
 
 //thanks to this JS solution
 //https://stackoverflow.com/questions/41561452/is-there-any-way-to-calculate-match-between-2-strings
-extern double match(const std::string& str1, const std::string& str2)
+
+template<typename T>
+extern double match(T& str1, T& str2)
 {
   double tmpValue = 0;
-  int minLength = str1.length();
-  if(str1.length() > str2.length())
+  int minSize = str1.size();
+  if(str1.size() > str2.size())
   {
-    minLength = str2.length();
+    minSize = str2.size();
   }
   
-  int maxLength = str1.length();
-  if(str1.length() < str2.length())
+  int maxSize = str1.size();
+  if(str1.size() < str2.size())
     {
-      maxLength = str2.length();
+      maxSize = str2.size();
     }
-  for(int i = 0; i < minLength; i++)
+  for(int i = 0; i < minSize; i++)
     {
       if(str1[i] == str2[i])
       {
@@ -26,8 +28,10 @@ extern double match(const std::string& str1, const std::string& str2)
       }
     }
 
-  double weight = tmpValue / maxLength;
+  double weight = tmpValue / maxSize;
   return (weight * 100);
 }
+#define match_s(s1,s2) match<std::string>(s1,s2)
+#define match_svec(s1,s2) match<svec>(s1,s2)
 
 #endif
