@@ -16,7 +16,6 @@ static double compare_on_high_level(const std::string& file1, const std::string&
 {
   auto content1 = get_high_level_content(file1+".ext");
   auto content2 = get_high_level_content(file2+".ext");
-  printf("%s\n %s\n",content1.c_str(),content2.c_str());
   return CSDP(content1,content2);
 }
 
