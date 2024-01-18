@@ -16,9 +16,9 @@ static double compare_on_high_level(const std::string& file1, const std::string&
 {
   auto content1 = get_high_level_content(file1+".ext");
   auto content2 = get_high_level_content(file2+".ext");
-  return match(content1,content2);
+  return match_svec(content1,content2);
 }
-
+  
 extern Comparision* compare(const std::string& file1, const std::string& file2)
 {
   auto high_level_diff = compare_on_high_level(file1,file2);
