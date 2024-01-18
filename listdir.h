@@ -4,13 +4,16 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include<string>
+#include<vector>
+
+typedef std::vector<std::string> svec;
 
 /*
   based on https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
 */
-extern std::string get_high_level_content(const std::string& docx_dir)
+extern svec get_high_level_content(const std::string& docx_dir)
 {
-  std::string content;
+  svec content;
 
   DIR *dp;
   struct dirent *ep;
@@ -22,7 +25,7 @@ extern std::string get_high_level_content(const std::string& docx_dir)
       {
 	std::string dir  = std::string(ep->d_name);
 	if(dir != "." && dir != "..")
-	  content += std::string(ep->d_name) + " ";
+	  content.push_back(std::string(ep->d_name));
       }
       (void) closedir (dp);
     }
