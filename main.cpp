@@ -1,5 +1,6 @@
 #include"strcomp.h"
 #include"mbytesreader.h"
+#include"listdir.h"
 #include<stdio.h>
 #include<unistd.h>
 
@@ -7,6 +8,7 @@
 
 inline int prepare(int argc, char** argv);
 inline void extract_docx(const std::string& file1);
+inline void cleanup(const std::string& file1, const std::string& file2);
 int main(int argc, char** argv)
 {
   //1) check input data correctness
@@ -14,7 +16,10 @@ int main(int argc, char** argv)
   //2) extract each docx to its own specific dir
 	extract_docx(TS(argv[1]));
 	extract_docx(TS(argv[2]));
-       
+
+  //3) clean up all dirs
+	cleanup(TS(argv[1]),TS(argv[2]));
+	
 	return 0;
 }
 int prepare(int argc, char** argv)
@@ -43,5 +48,10 @@ void extract_docx(const std::string& file)
   auto command  = "mkdir "+file+".ext && ";
   command      += "cd "+file+".ext && ";
   command      += "unzip ../"+file;
+  system(command.c_str());
+}
+void cleanup(const std::string& file1, const std::string& file2)
+{
+  auto command = "rm -rf "+file1+" && rm -rf "+file2;
   system(command.c_str());
 }
