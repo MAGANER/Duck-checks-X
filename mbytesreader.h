@@ -3,7 +3,7 @@
 #include<string>
 #include<stdio.h>
 
-static int read_file_magic_bytes(const char const* f)
+static int read_file_magic_bytes(const char* f)
 {
 	FILE* fp = fopen(f, "rb");
 	if (fp == NULL)
@@ -26,7 +26,7 @@ static int read_file_magic_bytes(const char const* f)
 	return summ;
 }
 
-extern bool is_docx_file(const char const* f)
+extern bool is_docx_file(const char* f)
 {
 	return read_file_magic_bytes(f) == 162;
 }
