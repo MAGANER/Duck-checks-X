@@ -85,21 +85,32 @@ public:
     
     for(auto& hub: diff_hubs)
     {
+      if(hub->diffs.empty())continue;
+      
+      //show common info: what's the dir and high level difference
       auto target = ANSI_COLOR_CYAN + hub->target_name + ANSI_COLOR_END;
       printf(".docx's dir - %s\n",target.c_str());
       printf("high level difference: %s %f%% %s\n",ANSI_COLOR_RED,hub->high_level_diff, ANSI_COLOR_END);
+
+      
+      auto vals = svec();
+      for(auto& h:hub->diffs)vals.push_back(h->s1);
+      auto max_size = (*std::max_element(vals.begin(),vals.end())).size();
+      
       for(auto& d: hub->diffs)
-      {
+      {	
 	auto diff_str = ANSI_COLOR_RED+std::to_string(d->value)+"%" + ANSI_COLOR_END;
 	auto left     = ANSI_COLOR_YELLOW + d->s1;
 	auto right    = ANSI_COLOR_GREEN  + d->s2;
+	
 	prepare_result_string(left);
 	prepare_result_string(right);
-	printf("%s --- %s difference: %s\n",
-	       left.c_str(),
-	       right.c_str(),
-	       diff_str.c_str());
+	
+	auto output = left + " --- "+right+" difference: "+diff_str;
+	make_align(d->s1,output,max_size);
+	printf("%s\n",output.c_str());
       }
+      
       printf("\n");
     }
   }
@@ -169,13 +180,24 @@ private:
 
     return full.substr(last,end);
   }
-  std:: string trim(const std::string& full)
+  std::string trim(const std::string& full)
   {
+    //remove root directory
     auto dot = full.find(".");
     return full.substr(dot,full.size());
   }
+  void make_align(const std::string& str,std::string& out, size_t max_len)
+  {
+    auto start = out.find('-')-1;
+    int diff = abs((int)max_len-(int)str.size());
+    
+    std::string align(diff,' ');
+    out.insert(start,align);
+  }
+  
   void prepare_result_string(std::string& full)
   {
+    //insert END sequence to make colored only root directory
     auto last = full.find_last_of("/");
     full.insert(last,ANSI_COLOR_END);
   }
