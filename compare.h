@@ -32,6 +32,8 @@ struct DiffHub
   {}
   ~DiffHub(){}
 };
+
+#define NOTFOUND(x,sub) x.find(sub) == std::string::npos
 class Comparerer
 {
   std::string file1,file2;
@@ -40,6 +42,16 @@ class Comparerer
 
   std::map<std::string, svec> content1, content2;
   std::vector<DiffHub*> diff_hubs;
+
+  // function that is used for testing
+  svec get_map_keys(std::map<std::string,svec>& map)
+  {
+    svec keys;
+    for(auto el: map)
+      keys.push_back(el.first);
+
+    return keys;
+  }
 public:
   Comparerer(const std::string& file1, const std::string& file2)
     :file1(file1),file2(file2)
@@ -54,10 +66,17 @@ public:
       for(auto& dir:content2_dirs)
       {
 	read_dir(file2+".ext/"+dir,content2);
-      }
+      }    
+      //print_docx_content(content1,file1);
+      //print_docx_content(content2,file2); 
 
-      compare(file1+".ext/",content1_files);
-      compare(file2+".ext/",content2_files);
+     compare(".ext/",".",content1_files,content2_files);
+     for(auto& el: content1)
+       {
+	 auto dir = el.first;
+	 auto dir_files = el.second;
+	 compare(trim(dir)+"/",get_dir(dir),content1[dir],content2[file2+trim(dir)]);
+       }
   }
   ~Comparerer(){}
 
@@ -112,25 +131,52 @@ private:
     get_high_level_content(dir,out[dir],out[dir]);
   }
 
-  void compare(const std::string& target_name,svec& content)
+  void compare(const std::string top_dir,const std::string& target_name,svec& content1, svec& content2)
   {
-    double high_level_diff = match_svec(content,content);
-    auto same_files = merge(content,content);
+    double high_level_diff = match_svec(content1,content2);
+    auto same_files = merge(content1,content2);
 
     std::vector<CountedDiff*> diffs;
     for(auto& s:same_files)
       {
-	auto f1 = file1+".ext/"+s.first;
-	auto f2 = file2+".ext/"+s.second;
+	//skip since these are directories
+	if(s.first == "_rels" or s.first == "theme") continue;
+	
+	auto f1 = file1+top_dir+s.first;
+	auto f2 = file2+top_dir+s.second;
 
 	auto f1_content = read_file(f1);
 	auto f2_content =read_file(f2);
-	
+
 	diffs.push_back(new CountedDiff(f1,f2, match_s(f1_content,f2_content)));
       }
 
     diff_hubs.push_back(new DiffHub(target_name,diffs,high_level_diff));
   }
-  
+  std::string get_dir(const std::string& full)
+  {
+    auto last = full.find_last_of("/");
+    auto end  = full.size();
+
+    return full.substr(last,end);
+  }
+  std:: string trim(const std::string& full)
+  {
+    auto dot = full.find(".");
+    return full.substr(dot,full.size());
+  }
+  void print_docx_content(std::map<std::string, svec>& content, const std::string& name)
+  {
+     for(auto& dir: content)
+	{
+	  printf("%s :",dir.first.c_str());
+	  for(auto& f:content[dir.first])
+	    {
+	      printf("%s , ",f.c_str());
+	    }
+	  printf("\n");
+	}
+     printf("---\n");
+  }
 };
 #endif
