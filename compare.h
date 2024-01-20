@@ -82,6 +82,10 @@ public:
 
     printf("%s %s directory's structure %s\n",ANSI_COLOR_MAGENTA,file2.c_str(),ANSI_COLOR_END);
     print_docx_content(content2,file2); 
+
+    print_file_version(file1);
+    print_file_version(file2);
+    printf("\n");
     
     for(auto& hub: diff_hubs)
     {
@@ -164,7 +168,7 @@ private:
 	auto f2 = file2+top_dir+s.second;
 
 	auto f1_content = read_file(f1);
-	auto f2_content =read_file(f2);
+	auto f2_content = read_file(f2);
 
 	diffs.push_back(new CountedDiff(f1,f2, match_s(f1_content,f2_content)));
       }
@@ -219,6 +223,26 @@ private:
 	    }
 	  printf("\n");
 	}
+  }
+
+  std::string get_app_version(const std::string& file)
+  {
+    auto dest    = file+".ext/docProps/app.xml";
+    auto content = read_file(dest);
+    
+    const std::string start_val = "<AppVersion>";
+    auto start = content.find(start_val);
+    auto end = content.find("</AppVersion>");
+    if(start == std::string::npos or end == std::string::npos)return "";
+
+    auto sub = content.substr(start+start_val.size(),end);
+    end = sub.find("</AppVersion>");
+    return sub.substr(0,end);
+  }
+  void print_file_version(const std::string& file)
+  {
+    auto ver1 = ANSI_COLOR_YELLOW+get_app_version(file)+ANSI_COLOR_END;
+    printf("%s's version: %s\n",file.c_str(),ver1.c_str());
   }
 };
 #endif
