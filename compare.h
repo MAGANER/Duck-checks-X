@@ -12,19 +12,25 @@
 #include<map>
 
 typedef std::pair<std::string,std::string> spair;
+
+
+//contains difference for 2 files
 struct CountedDiff
 {
-  std::string s1,s2;
+  std::string s1,s2; //files
   double value;
   CountedDiff(const std::string& s1, const std::string& s2, double value)
     : s1(s1), s2(s2),value(value) {}
   ~CountedDiff(){}
 };
+
+//contains differences of files for the same 2 directories
+//_rels and _rels for example
 struct DiffHub
 {
   std::string target_name;
   std::vector<CountedDiff*> diffs;
-  double high_level_diff;
+  double high_level_diff; //difference on directory level
   DiffHub(const std::string& target_name,
 	  std::vector<CountedDiff*>& diffs,
 	  double high_level_diff)
@@ -42,16 +48,6 @@ class Comparerer
 
   std::map<std::string, svec> content1, content2;
   std::vector<DiffHub*> diff_hubs;
-
-  // function that is used for testing
-  svec get_map_keys(std::map<std::string,svec>& map)
-  {
-    svec keys;
-    for(auto el: map)
-      keys.push_back(el.first);
-
-    return keys;
-  }
 public:
   Comparerer(const std::string& file1, const std::string& file2)
     :file1(file1),file2(file2)
@@ -66,10 +62,8 @@ public:
       for(auto& dir:content2_dirs)
       {
 	read_dir(file2+".ext/"+dir,content2);
-      }    
-      //print_docx_content(content1,file1);
-      //print_docx_content(content2,file2); 
-
+      }
+      
      compare(".ext/",".",content1_files,content2_files);
      for(auto& el: content1)
        {
@@ -83,16 +77,31 @@ public:
   
   void print()
   {
+    printf("%s %s directory's structure %s\n",ANSI_COLOR_MAGENTA,file1.c_str(),ANSI_COLOR_END);
+    print_docx_content(content1,file1);
+
+    printf("%s %s directory's structure %s\n",ANSI_COLOR_MAGENTA,file2.c_str(),ANSI_COLOR_END);
+    print_docx_content(content2,file2); 
+    
     for(auto& hub: diff_hubs)
     {
-      printf("%s\n",hub->target_name.c_str());
+      auto target = ANSI_COLOR_CYAN + hub->target_name + ANSI_COLOR_END;
+      printf(".docx's dir - %s\n",target.c_str());
       printf("high level difference: %s %f%% %s\n",ANSI_COLOR_RED,hub->high_level_diff, ANSI_COLOR_END);
       for(auto& d: hub->diffs)
       {
-	printf("%s --- %s difference: %s %f%% %s\n",d->s1.c_str(),d->s2.c_str(),ANSI_COLOR_RED,d->value,ANSI_COLOR_END);
+	auto diff_str = ANSI_COLOR_RED+std::to_string(d->value)+"%" + ANSI_COLOR_END;
+	auto left     = ANSI_COLOR_YELLOW + d->s1;
+	auto right    = ANSI_COLOR_GREEN  + d->s2;
+	prepare_result_string(left);
+	prepare_result_string(right);
+	printf("%s --- %s difference: %s\n",
+	       left.c_str(),
+	       right.c_str(),
+	       diff_str.c_str());
       }
+      printf("\n");
     }
-    printf("-----------\n");
   }
 private:
   std::vector<spair> merge(svec& vec1, svec& vec2)
@@ -139,7 +148,7 @@ private:
     std::vector<CountedDiff*> diffs;
     for(auto& s:same_files)
       {
-	//skip since these are directories
+	//skip since these are directories. TODO: process them later, recursively
 	if(s.first == "_rels" or s.first == "theme") continue;
 	
 	auto f1 = file1+top_dir+s.first;
@@ -165,6 +174,11 @@ private:
     auto dot = full.find(".");
     return full.substr(dot,full.size());
   }
+  void prepare_result_string(std::string& full)
+  {
+    auto last = full.find_last_of("/");
+    full.insert(last,ANSI_COLOR_END);
+  }
   void print_docx_content(std::map<std::string, svec>& content, const std::string& name)
   {
      for(auto& dir: content)
@@ -172,11 +186,10 @@ private:
 	  printf("%s :",dir.first.c_str());
 	  for(auto& f:content[dir.first])
 	    {
-	      printf("%s , ",f.c_str());
+	      printf("%s ",f.c_str());
 	    }
 	  printf("\n");
 	}
-     printf("---\n");
   }
 };
 #endif
