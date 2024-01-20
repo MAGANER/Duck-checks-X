@@ -1,3 +1,6 @@
+/*
+  This header provides 1 external function that check is provided file .docx
+*/
 #ifndef MBYTESREADER_H
 #define MBYTESREADER_H
 #include<string>
@@ -28,6 +31,7 @@ static int read_file_magic_bytes(const char* f)
 
 extern bool is_docx_file(const char* f)
 {
+  //162 is sum of all magic bytes that express .DOCX
 	return read_file_magic_bytes(f) == 162;
 }
 

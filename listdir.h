@@ -1,3 +1,7 @@
+/*
+  This header provides 1 external procedure to get vector of fies/subdirectories for provided dir
+*/
+
 #ifndef LISTDIR_H
 #define LISTDIR_H
 #include <stdio.h>

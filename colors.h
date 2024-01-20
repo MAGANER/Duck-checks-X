@@ -1,3 +1,6 @@
+/*
+  the set of escape-sequences that represents colors
+*/
 #ifndef COLOREDPRINTF_H
 #define COLOREDPRINTF_H
 #define ANSI_COLOR_RED     "\x1b[31m"

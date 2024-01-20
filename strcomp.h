@@ -1,3 +1,6 @@
+/*
+  header thats provides function to compute percentage difference between 2 different sequences
+*/
 #ifndef STRCOMP_H
 #define STRCOMP_H
 #include<string>
@@ -27,11 +30,10 @@ extern double match(T& str1, T& str2)
 	tmpValue++;
       }
     }
-  //printf("%i %i\n",minSize,maxSize);
   double weight = tmpValue / maxSize;
-  //printf("%i %i %f\n",tmpValue, maxSize,weight*100.0);
   return 100.0- (weight * 100.0);
 }
+
 #define match_s(s1,s2) match<std::string>(s1,s2)
 #define match_svec(s1,s2) match<svec>(s1,s2)
 
