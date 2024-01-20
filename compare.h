@@ -92,11 +92,8 @@ public:
       printf(".docx's dir - %s\n",target.c_str());
       printf("high level difference: %s %f%% %s\n",ANSI_COLOR_RED,hub->high_level_diff, ANSI_COLOR_END);
 
-      
-      auto vals = svec();
-      for(auto& h:hub->diffs)vals.push_back(h->s1);
-      auto max_size = (*std::max_element(vals.begin(),vals.end())).size();
-      
+      auto left_max_size = compute_max_size_for_hub_target(hub);
+      auto right_max_size = compute_max_size_for_hub_target(hub,false);
       for(auto& d: hub->diffs)
       {	
 	auto diff_str = ANSI_COLOR_RED+std::to_string(d->value)+"%" + ANSI_COLOR_END;
@@ -106,8 +103,9 @@ public:
 	prepare_result_string(left);
 	prepare_result_string(right);
 	
-	auto output = left + " --- "+right+" difference: "+diff_str;
-	make_align(d->s1,output,max_size);
+	auto output = left + " --- "+right+" difference : "+diff_str;
+	make_align(d->s1,output,left_max_size,"-");
+	make_align(d->s2,output,right_max_size,"difference");
 	printf("%s\n",output.c_str());
       }
       
@@ -186,13 +184,22 @@ private:
     auto dot = full.find(".");
     return full.substr(dot,full.size());
   }
-  void make_align(const std::string& str,std::string& out, size_t max_len)
+  void make_align(const std::string& str,std::string& out, size_t max_len, const std::string& point)
   {
-    auto start = out.find('-')-1;
+    auto start = out.find(point)-1;
     int diff = abs((int)max_len-(int)str.size());
     
     std::string align(diff,' ');
     out.insert(start,align);
+  }
+  size_t compute_max_size_for_hub_target(DiffHub* hub, bool s1=true)
+  {
+    auto vals = svec();
+    for(auto& h:hub->diffs)
+      if(s1)vals.push_back(h->s1);
+      else  vals.push_back(h->s2);
+    
+    return  (*std::max_element(vals.begin(),vals.end())).size();  
   }
   
   void prepare_result_string(std::string& full)
