@@ -38,6 +38,8 @@ extern void get_high_level_content(const std::string& docx_dir, svec& files, sve
 	  }
       }
       (void) closedir (dp);
+
+      printf("\n");
     }
   else
     {
