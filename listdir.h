@@ -50,6 +50,11 @@ extern void get_high_level_content(const std::string& docx_dir, svec& files, sve
       printf("failed to open %s directory!\n",docx_dir.c_str());
     }
 }
+extern void get_high_level_content(const std::string& docx_dir, svec& files)
+{
+  svec dirs;
+  get_high_level_content(docx_dir,files,dirs);
+}
 
 
 #endif 
