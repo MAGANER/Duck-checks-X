@@ -12,7 +12,7 @@
 #include<map>
 
 typedef std::pair<std::string,std::string> spair;
-
+typedef std::pair<svec,svec> svecp;
 
 //contains difference for 2 files
 struct CountedDiff
@@ -30,11 +30,14 @@ struct DiffHub
 {
   std::string target_name;
   std::vector<CountedDiff*> diffs;
+  svecp different_files; //first vec contains unique files for fst and the second one contains unique for snd file
+  
   double high_level_diff; //difference on directory level
   DiffHub(const std::string& target_name,
 	  std::vector<CountedDiff*>& diffs,
-	  double high_level_diff)
-    :target_name(target_name),diffs(diffs), high_level_diff(high_level_diff)
+	  double high_level_diff,
+	  svecp& diff_files)
+    :target_name(target_name),diffs(diffs), high_level_diff(high_level_diff),different_files(diff_files)
   {}
   ~DiffHub(){}
 };
@@ -112,6 +115,22 @@ public:
 	make_align(d->s2,output,right_max_size,"difference");
 	printf("%s\n",output.c_str());
       }
+
+      if(!hub->different_files.first.empty())
+	{
+	  auto output = ANSI_COLOR_MAGENTA+ file1+"'s unique files:" + ANSI_COLOR_END;
+	  printf("%s",output.c_str());
+	  for(auto& el: hub->different_files.first)
+	    printf("%s ",el.c_str());
+	}
+      printf("\n");
+      if(!hub->different_files.second.empty())
+	{
+	  auto output = ANSI_COLOR_MAGENTA+ file2+"'s unique files:" + ANSI_COLOR_END;
+	  printf("%s",output.c_str());
+	  for(auto& el: hub->different_files.second)
+	    printf("%s ",el.c_str());
+	}
       
       printf("\n");
     }
@@ -157,7 +176,7 @@ private:
   {
     double high_level_diff = match_svec(content1,content2);
     auto same_files = merge(content1,content2);
-
+    auto different_files = get_unique_vectors(content1,content2);
     std::vector<CountedDiff*> diffs;
     for(auto& s:same_files)
       {
@@ -173,7 +192,7 @@ private:
 	diffs.push_back(new CountedDiff(f1,f2, match_s(f1_content,f2_content)));
       }
 
-    diff_hubs.push_back(new DiffHub(target_name,diffs,high_level_diff));
+    diff_hubs.push_back(new DiffHub(target_name,diffs,high_level_diff,different_files));
   }
   std::string get_dir(const std::string& full)
   {
@@ -244,5 +263,17 @@ private:
     auto ver1 = ANSI_COLOR_YELLOW+get_app_version(file)+ANSI_COLOR_END;
     printf("%s's version: %s\n",file.c_str(),ver1.c_str());
   }
+  svecp get_unique_vectors(const svec& vec1, const svec& vec2)
+  {
+    svec vec1Copy(vec1);
+    svec vec2Copy(vec2);
+
+    svec left,right;
+    std::set_difference(vec1.begin(),vec1.end(),vec2.begin(),vec2.end(),std::inserter(left,left.end()));
+    std::set_difference(vec2.begin(),vec2.end(),vec1.begin(),vec1.end(),std::inserter(right,right.end()));
+
+    return {left, right};
+  }
+
 };
 #endif
