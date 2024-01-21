@@ -180,8 +180,39 @@ private:
     std::vector<CountedDiff*> diffs;
     for(auto& s:same_files)
       {
-	//skip since these are directories. TODO: process them later, recursively
-	if(s.first == "_rels" or s.first == "theme") continue;
+
+	//get files from subdirs
+	if(s.first == "_rels" or s.first == "theme")
+	  {
+	    svec dir1_files, dir2_files;
+	    auto path1 = file1+top_dir+s.first;
+	    auto path2 = file2+top_dir+s.first;
+	    get_high_level_content(path1,dir1_files);
+	    get_high_level_content(path2,dir2_files);
+	    for(size_t i = 0;i<dir1_files.size();i++)
+	      {
+		dir1_files[0] = path1 +"/"+ dir1_files[0];
+	      }
+	    for(size_t i = 0;i<dir2_files.size();i++)
+	      {
+		dir2_files[0] = path2 +"/"+ dir2_files[0];
+	      }
+
+	    auto same = merge(dir1_files,dir2_files);
+	    for(auto& s: same)
+	      {
+		same_files.push_back(s);
+	      }
+
+	    auto unique = get_unique_vectors(dir1_files,dir2_files);
+	    for(auto& f:unique.first)
+	      different_files.first.push_back(f);
+
+	    for(auto& f:unique.first)
+	      different_files.first.push_back(f);
+
+	    continue;
+	  }
 	
 	auto f1 = file1+top_dir+s.first;
 	auto f2 = file2+top_dir+s.second;
